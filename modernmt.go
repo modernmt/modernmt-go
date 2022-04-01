@@ -3,7 +3,7 @@ package modernmt
 import "os"
 
 func Create(apiKey string) *ModernMT {
-	return CreateWithIdentity(apiKey, "modernmt-go", "1.0.0")
+	return CreateWithIdentity(apiKey, "modernmt-go", "1.0.1")
 }
 
 func CreateWithIdentity(apiKey string, platform string, platformVersion string) *ModernMT {
