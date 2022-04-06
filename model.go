@@ -95,10 +95,16 @@ type ImportJob struct {
 }
 
 func makeImportJob(data map[string]interface{}) ImportJob {
-	return ImportJob{
+	importJob := ImportJob{
 		Id:       data["id"].(string),
-		Memory:   int64(data["memory"].(float64)),
 		Size:     int(data["size"].(float64)),
 		Progress: float32(data["progress"].(float64)),
 	}
+
+	memory, ok := data["memory"].(float64)
+	if ok {
+		importJob.Memory = int64(memory)
+	}
+
+	return importJob
 }
