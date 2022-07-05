@@ -88,6 +88,9 @@ func (re *ModernMT) TranslateListAdaptive(source string, target string, q []stri
 		if options.Timeout != 0 {
 			data["timeout"] = options.Timeout
 		}
+		if options.Format != "" {
+			data["format"] = options.Format
+		}
 	}
 
 	res, err := re.client.send("GET", "/translate", data, nil)

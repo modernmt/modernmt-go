@@ -35,6 +35,7 @@ type TranslateOptions struct {
 	ProjectId string
 	Multiline *bool
 	Timeout   int
+	Format    string
 }
 
 type Translation struct {
