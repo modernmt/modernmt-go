@@ -20,7 +20,12 @@ func (re *memoryServices) List() ([]Memory, error) {
 }
 
 func (re *memoryServices) Get(id int64) (Memory, error) {
-	path := "/memories/" + strconv.FormatInt(id, 10)
+	_id := strconv.FormatInt(id, 10)
+	return re.GetByKey(_id)
+}
+
+func (re *memoryServices) GetByKey(id string) (Memory, error) {
+	path := "/memories/" + id
 	res, err := re.client.send("GET", path, nil, nil)
 	if err != nil {
 		return Memory{}, err
@@ -68,6 +73,11 @@ func (re *memoryServices) Connect(name string, description string, externalId st
 }
 
 func (re *memoryServices) Edit(id int64, name string, description string) (Memory, error) {
+	_id := strconv.FormatInt(id, 10)
+	return re.EditByKey(_id, name, description)
+}
+
+func (re *memoryServices) EditByKey(id string, name string, description string) (Memory, error) {
 	data := map[string]interface{}{}
 
 	if name != "" {
@@ -78,7 +88,7 @@ func (re *memoryServices) Edit(id int64, name string, description string) (Memor
 		data["description"] = description
 	}
 
-	path := "/memories/" + strconv.FormatInt(id, 10)
+	path := "/memories/" + id
 	res, err := re.client.send("PUT", path, data, nil)
 	if err != nil {
 		return Memory{}, err
@@ -88,7 +98,12 @@ func (re *memoryServices) Edit(id int64, name string, description string) (Memor
 }
 
 func (re *memoryServices) Delete(id int64) (Memory, error) {
-	path := "/memories/" + strconv.FormatInt(id, 10)
+	_id := strconv.FormatInt(id, 10)
+	return re.DeleteByKey(_id)
+}
+
+func (re *memoryServices) DeleteByKey(id string) (Memory, error) {
+	path := "/memories/" + id
 	res, err := re.client.send("DELETE", path, nil, nil)
 	if err != nil {
 		return Memory{}, err
@@ -98,6 +113,12 @@ func (re *memoryServices) Delete(id int64) (Memory, error) {
 }
 
 func (re *memoryServices) Add(id int64, source string, target string, sentence string, translation string,
+	tuid string) (ImportJob, error) {
+	_id := strconv.FormatInt(id, 10)
+	return re.AddByKey(_id, source, target, sentence, translation, tuid)
+}
+
+func (re *memoryServices) AddByKey(id string, source string, target string, sentence string, translation string,
 	tuid string) (ImportJob, error) {
 
 	data := map[string]interface{}{
@@ -111,7 +132,7 @@ func (re *memoryServices) Add(id int64, source string, target string, sentence s
 		data["tuid"] = tuid
 	}
 
-	path := "/memories/" + strconv.FormatInt(id, 10) + "/content"
+	path := "/memories/" + id + "/content"
 	res, err := re.client.send("POST", path, data, nil)
 	if err != nil {
 		return ImportJob{}, err
@@ -122,6 +143,12 @@ func (re *memoryServices) Add(id int64, source string, target string, sentence s
 
 func (re *memoryServices) Replace(id int64, tuid string, source string, target string, sentence string,
 	translation string) (ImportJob, error) {
+	_id := strconv.FormatInt(id, 10)
+	return re.ReplaceByKey(_id, tuid, source, target, sentence, translation)
+}
+
+func (re *memoryServices) ReplaceByKey(id string, tuid string, source string, target string, sentence string,
+	translation string) (ImportJob, error) {
 
 	data := map[string]interface{}{
 		"tuid":        tuid,
@@ -131,7 +158,7 @@ func (re *memoryServices) Replace(id int64, tuid string, source string, target s
 		"translation": translation,
 	}
 
-	path := "/memories/" + strconv.FormatInt(id, 10) + "/content"
+	path := "/memories/" + id + "/content"
 	res, err := re.client.send("PUT", path, data, nil)
 	if err != nil {
 		return ImportJob{}, err
@@ -141,15 +168,25 @@ func (re *memoryServices) Replace(id int64, tuid string, source string, target s
 }
 
 func (re *memoryServices) ImportTmxPath(id int64, path string, compression string) (ImportJob, error) {
+	_id := strconv.FormatInt(id, 10)
+	return re.ImportTmxPathByKey(_id, path, compression)
+}
+
+func (re *memoryServices) ImportTmxPathByKey(id string, path string, compression string) (ImportJob, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return ImportJob{}, err
 	}
 
-	return re.ImportTmx(id, file, compression)
+	return re.ImportTmxByKey(id, file, compression)
 }
 
 func (re *memoryServices) ImportTmx(id int64, tmx *os.File, compression string) (ImportJob, error) {
+	_id := strconv.FormatInt(id, 10)
+	return re.ImportTmxByKey(_id, tmx, compression)
+}
+
+func (re *memoryServices) ImportTmxByKey(id string, tmx *os.File, compression string) (ImportJob, error) {
 	data := map[string]interface{}{}
 
 	if compression != "" {
@@ -160,7 +197,7 @@ func (re *memoryServices) ImportTmx(id int64, tmx *os.File, compression string) 
 		"tmx": tmx,
 	}
 
-	path := "/memories/" + strconv.FormatInt(id, 10) + "/content"
+	path := "/memories/" + id + "/content"
 	res, err := re.client.send("POST", path, data, files)
 	if err != nil {
 		return ImportJob{}, err
