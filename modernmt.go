@@ -48,6 +48,36 @@ func (re *ModernMT) ListSupportedLanguages() ([]string, error) {
 	return languages, nil
 }
 
+func (re *ModernMT) DetectLanguage(q string, format string) (DetectedLanguage, error) {
+	res, err := re.DetectLanguages([]string{q}, format)
+	if err != nil {
+		return DetectedLanguage{}, err
+	}
+
+	return res[0], nil
+}
+
+func (re *ModernMT) DetectLanguages(q []string, format string) ([]DetectedLanguage, error) {
+	data := map[string]interface{}{
+		"q": q,
+	}
+
+	if format != "" {
+		data["format"] = format
+	}
+	res, err := re.client.send("GET", "/translate/detect", data, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var languages []DetectedLanguage
+	for _, el := range res.([]interface{}) {
+		languages = append(languages, makeDetectedLanguage(el.(map[string]interface{})))
+	}
+
+	return languages, nil
+}
+
 func (re *ModernMT) Translate(source string, target string, q string, options *TranslateOptions) (Translation, error) {
 	return re.TranslateAdaptive(source, target, q, nil, "", options)
 }

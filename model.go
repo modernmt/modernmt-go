@@ -109,3 +109,15 @@ func makeImportJob(data map[string]interface{}) ImportJob {
 
 	return importJob
 }
+
+type DetectedLanguage struct {
+	BilledCharacters int
+	DetectedLanguage string
+}
+
+func makeDetectedLanguage(data map[string]interface{}) DetectedLanguage {
+	return DetectedLanguage{
+		BilledCharacters: int(data["billedCharacters"].(float64)),
+		DetectedLanguage: data["detectedLanguage"].(string),
+	}
+}
