@@ -14,7 +14,7 @@ func toSliceOfString(slice []int64) []string {
 }
 
 func Create(apiKey string) *ModernMT {
-	return CreateWithIdentity(apiKey, "modernmt-go", "1.0.3")
+	return CreateWithIdentity(apiKey, "modernmt-go", "1.0.4")
 }
 
 func CreateWithIdentity(apiKey string, platform string, platformVersion string) *ModernMT {
