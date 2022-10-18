@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func CreateHttpClient(baseUrl string, headers map[string]string) *httpClient {
+func createHttpClient(baseUrl string, headers map[string]string) *httpClient {
 	return &httpClient{
 		baseUrl: baseUrl,
 		headers: headers,

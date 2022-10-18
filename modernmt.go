@@ -24,7 +24,7 @@ func CreateWithIdentity(apiKey string, platform string, platformVersion string) 
 		"MMT-PlatformVersion": platformVersion,
 	}
 
-	client := CreateHttpClient("https://api.modernmt.com", headers)
+	client := createHttpClient("https://api.modernmt.com", headers)
 
 	return &ModernMT{
 		client: client,
