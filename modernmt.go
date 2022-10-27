@@ -144,6 +144,9 @@ func (re *ModernMT) TranslateListAdaptiveWithKeys(source string, target string, 
 		if options.Format != "" {
 			data["format"] = options.Format
 		}
+		if options.AltTranslations != 0 {
+			data["alt_translations"] = options.AltTranslations
+		}
 	}
 
 	res, err := re.client.send("GET", "/translate", data, nil)

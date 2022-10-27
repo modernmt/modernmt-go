@@ -31,11 +31,12 @@ func (re APIError) Error() string {
 }
 
 type TranslateOptions struct {
-	Priority  string
-	ProjectId string
-	Multiline *bool
-	Timeout   int
-	Format    string
+	Priority        string
+	ProjectId       string
+	Multiline       *bool
+	Timeout         int
+	Format          string
+	AltTranslations int
 }
 
 type Translation struct {
@@ -44,6 +45,7 @@ type Translation struct {
 	Characters       int
 	BilledCharacters int
 	DetectedLanguage string
+	AltTranslations  []string
 }
 
 func makeTranslation(data map[string]interface{}) Translation {
@@ -61,6 +63,15 @@ func makeTranslation(data map[string]interface{}) Translation {
 	detectedLanguage, ok := data["detectedLanguage"].(string)
 	if ok {
 		translation.DetectedLanguage = detectedLanguage
+	}
+
+	altTranslationsInterface, ok := data["altTranslations"].([]interface{})
+	if ok {
+		altTranslations := make([]string, len(altTranslationsInterface))
+		for i, v := range altTranslationsInterface {
+			altTranslations[i] = v.(string)
+		}
+		translation.AltTranslations = altTranslations
 	}
 
 	return translation
