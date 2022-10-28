@@ -7,6 +7,6 @@ if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
 	exit 1
 fi
 
-header_match="	return CreateWithIdentity\(apiKey, \"modernmt-go\", "
-header_ver="	return CreateWithIdentity\(apiKey, \"modernmt-go\", \"${VERSION}\"\)"
+header_match="	return CreateWithIdentityAndClientId\(apiKey, \"modernmt-go\", "
+header_ver="	return CreateWithIdentityAndClientId\(apiKey, \"modernmt-go\", \"${VERSION}\", apiClient\)"
 sed -i -E "/$header_match/s/.*/$header_ver/" modernmt.go

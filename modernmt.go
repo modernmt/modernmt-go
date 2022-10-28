@@ -14,14 +14,26 @@ func toSliceOfString(slice []int64) []string {
 }
 
 func Create(apiKey string) *ModernMT {
-	return CreateWithIdentity(apiKey, "modernmt-go", "1.0.4")
+	return CreateWithClientId(apiKey, 0)
 }
 
 func CreateWithIdentity(apiKey string, platform string, platformVersion string) *ModernMT {
+	return CreateWithIdentityAndClientId(apiKey, platform, platformVersion, 0)
+}
+
+func CreateWithClientId(apiKey string, apiClient int64) *ModernMT {
+	return CreateWithIdentityAndClientId(apiKey, "modernmt-go", "1.0.4", apiClient)
+}
+
+func CreateWithIdentityAndClientId(apiKey string, platform string, platformVersion string, apiClient int64) *ModernMT {
 	headers := map[string]string{
 		"MMT-ApiKey":          apiKey,
 		"MMT-Platform":        platform,
 		"MMT-PlatformVersion": platformVersion,
+	}
+
+	if apiClient != 0 {
+		headers["MMT-ApiClient"] = strconv.FormatInt(apiClient, 10)
 	}
 
 	client := createHttpClient("https://api.modernmt.com", headers)
