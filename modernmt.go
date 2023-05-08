@@ -47,7 +47,7 @@ func CreateWithIdentityAndClientId(apiKey string, platform string, platformVersi
 }
 
 func (re *ModernMT) ListSupportedLanguages() ([]string, error) {
-	res, err := re.client.send("GET", "/translate/languages", nil, nil)
+	res, err := re.client.send("GET", "/translate/languages", nil, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (re *ModernMT) DetectLanguages(q []string, format string) ([]DetectedLangua
 	if format != "" {
 		data["format"] = format
 	}
-	res, err := re.client.send("GET", "/translate/detect", data, nil)
+	res, err := re.client.send("GET", "/translate/detect", data, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +161,7 @@ func (re *ModernMT) TranslateListAdaptiveWithKeys(source string, target string, 
 		}
 	}
 
-	res, err := re.client.send("GET", "/translate", data, nil)
+	res, err := re.client.send("GET", "/translate", data, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -172,6 +172,82 @@ func (re *ModernMT) TranslateListAdaptiveWithKeys(source string, target string, 
 	}
 
 	return translations, nil
+}
+
+func (re *ModernMT) BatchTranslate(webhook string, source string, target string, q string, options *TranslateOptions) (bool, error) {
+	return re.BatchTranslateAdaptive(webhook, source, target, q, nil, "", options)
+}
+
+func (re *ModernMT) BatchTranslateAdaptive(webhook string, source string, target string, q string, hints []int64, contextVector string,
+	options *TranslateOptions) (bool, error) {
+	_hints := toSliceOfString(hints)
+	return re.BatchTranslateAdaptiveWithKeys(webhook, source, target, q, _hints, contextVector, options)
+}
+
+func (re *ModernMT) BatchTranslateAdaptiveWithKeys(webhook string, source string, target string, q string, hints []string,
+	contextVector string, options *TranslateOptions) (bool, error) {
+	return re.BatchTranslateListAdaptiveWithKeys(webhook, source, target, []string{q}, hints, contextVector, options)
+}
+
+func (re *ModernMT) BatchTranslateList(webhook string, source string, target string, q []string,
+	options *TranslateOptions) (bool, error) {
+
+	return re.BatchTranslateListAdaptive(webhook, source, target, q, nil, "", options)
+}
+
+func (re *ModernMT) BatchTranslateListAdaptive(webhook string, source string, target string, q []string, hints []int64,
+	contextVector string, options *TranslateOptions) (bool, error) {
+	_hints := toSliceOfString(hints)
+	return re.BatchTranslateListAdaptiveWithKeys(webhook, source, target, q, _hints, contextVector, options)
+}
+
+func (re *ModernMT) BatchTranslateListAdaptiveWithKeys(webhook string, source string, target string, q []string, hints []string,
+	contextVector string, options *TranslateOptions) (bool, error) {
+
+	data := map[string]interface{}{
+		"webhook": webhook,
+		"source":  source,
+		"target":  target,
+		"q":       q,
+	}
+
+	if contextVector != "" {
+		data["context_vector"] = contextVector
+	}
+
+	if hints != nil {
+		data["hints"] = hints
+	}
+
+	headers := map[string]string{}
+
+	if options != nil {
+		if options.ProjectId != "" {
+			data["project_id"] = options.ProjectId
+		}
+		if options.Multiline != nil {
+			data["multiline"] = *options.Multiline
+		}
+		if options.Format != "" {
+			data["format"] = options.Format
+		}
+		if options.AltTranslations != 0 {
+			data["alt_translations"] = options.AltTranslations
+		}
+		if options.Metadata != nil {
+			data["metadata"] = options.Metadata
+		}
+		if options.IdempotencyKey != "" {
+			headers["x-idempotency-key"] = options.IdempotencyKey
+		}
+	}
+
+	res, err := re.client.send("POST", "/translate/batch", data, nil, headers)
+	if err != nil {
+		return false, err
+	}
+
+	return res.(map[string]interface{})["enqueued"].(bool), nil
 }
 
 func (re *ModernMT) GetContextVector(source string, target string, text string, hints []int64,
@@ -238,7 +314,7 @@ func (re *ModernMT) GetContextVectorsByKeys(source string, targets []string, tex
 		data["limit"] = limit
 	}
 
-	res, err := re.client.send("GET", "/context-vector", data, nil)
+	res, err := re.client.send("GET", "/context-vector", data, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -283,7 +359,7 @@ func (re *ModernMT) GetContextVectorsFromFileByKeys(source string, targets []str
 		data["compression"] = compression
 	}
 
-	res, err := re.client.send("GET", "/context-vector", data, files)
+	res, err := re.client.send("GET", "/context-vector", data, files, nil)
 	if err != nil {
 		return nil, err
 	}

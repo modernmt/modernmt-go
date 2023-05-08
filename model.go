@@ -37,6 +37,10 @@ type TranslateOptions struct {
 	Timeout         int
 	Format          string
 	AltTranslations int
+
+	// batch translation
+	Metadata       interface{}
+	IdempotencyKey string
 }
 
 type Translation struct {
