@@ -1,8 +1,14 @@
 package modernmt
 
 import (
+	"crypto/rsa"
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
+	"github.com/golang-jwt/jwt/v5"
 	"os"
 	"strconv"
+	"time"
 )
 
 func toSliceOfString(slice []int64) []string {
@@ -40,6 +46,8 @@ func CreateWithIdentityAndClientId(apiKey string, platform string, platformVersi
 
 	return &ModernMT{
 		client: client,
+		pk:     nil,
+		pkTime: 0,
 		Memories: memoryServices{
 			client: client,
 		},
@@ -389,4 +397,121 @@ func (re *ModernMT) GetContextVectorsFromFilePathByKeys(source string, targets [
 	}
 
 	return re.GetContextVectorsFromFileByKeys(source, targets, file, hints, limit, compression)
+}
+
+func (re *ModernMT) HandleTranslateCallback(body []byte, signature string) (Translation, error) {
+	res, err := re.HandleTranslateListCallback(body, signature)
+	if err != nil {
+		return Translation{}, err
+	}
+
+	return res[0], nil
+}
+
+func (re *ModernMT) HandleTranslateCallbackWithMetadata(body []byte, signature string, metadata interface{}) (Translation, error) {
+	res, err := re.HandleTranslateListCallbackWithMetadata(body, signature, metadata)
+	if err != nil {
+		return Translation{}, err
+	}
+
+	return res[0], nil
+}
+
+func (re *ModernMT) HandleTranslateListCallback(body []byte, signature string) ([]Translation, error) {
+	return re.HandleTranslateListCallbackWithMetadata(body, signature, nil)
+}
+
+func (re *ModernMT) HandleTranslateListCallbackWithMetadata(body []byte, signature string, metadata interface{}) ([]Translation, error) {
+	err := re.verifyCallbackSignature(signature)
+	if err != nil {
+		return nil, err
+	}
+
+	var jBody map[string]interface{}
+	err = json.Unmarshal(body, &jBody)
+	if err != nil {
+		return nil, err
+	}
+
+	if metadata != nil {
+		// not a fan of it, but it seems the easiest way to do it
+		bytes, err := json.Marshal(jBody["metadata"])
+		if err != nil {
+			return nil, err
+		}
+		err = json.Unmarshal(bytes, metadata)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	result := jBody["result"].(map[string]interface{})
+
+	status := int(result["status"].(float64))
+	if status >= 300 || status < 200 {
+		e := result["error"].(map[string]interface{})
+		return nil, APIError{
+			Status:  status,
+			Type:    e["type"].(string),
+			Message: e["message"].(string),
+		}
+	} else {
+		var translations []Translation
+		for _, el := range result["data"].([]interface{}) {
+			translations = append(translations, makeTranslation(el.(map[string]interface{})))
+		}
+
+		return translations, nil
+	}
+}
+
+func (re *ModernMT) verifyCallbackSignature(signature string) error {
+	token, err := jwt.Parse(signature, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+
+		pk, err := re.getPublicKey()
+		if err != nil {
+			return nil, err
+		}
+
+		return pk, nil
+	})
+
+	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return nil
+	} else {
+		return err
+	}
+}
+
+func (re *ModernMT) getPublicKey() (*rsa.PublicKey, error) {
+	if re.pk == nil || re.pkTime+3600 < time.Now().Unix() {
+		res, err := re.retrievePublicKey()
+		if err == nil {
+			re.pk = res
+			re.pkTime = time.Now().Unix()
+		} else if re.pk == nil { //  if previous version ok pk is available, ignore API exception
+			return nil, err
+		}
+	}
+
+	return re.pk, nil
+}
+
+func (re *ModernMT) retrievePublicKey() (*rsa.PublicKey, error) {
+	res, err := re.client.send("GET", "/translate/batch/key", nil, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	encoded := res.(map[string]interface{})["publicKey"].(string)
+	decoded, err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		return nil, err
+	}
+
+	return jwt.ParseRSAPublicKeyFromPEM(decoded)
 }

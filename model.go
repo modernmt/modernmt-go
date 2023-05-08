@@ -1,12 +1,15 @@
 package modernmt
 
 import (
+	"crypto/rsa"
 	"fmt"
 	"net/http"
 )
 
 type ModernMT struct {
 	client   *httpClient
+	pk       *rsa.PublicKey
+	pkTime   int64
 	Memories memoryServices
 }
 
