@@ -117,9 +117,13 @@ func (re *httpClient) send(method string, path string, data map[string]interface
 	}
 
 	req.Header.Add("X-HTTP-Method-Override", method)
-	for key, val := range re.headers {
-		req.Header.Add(key, val)
+
+	if re.headers != nil {
+		for key, val := range re.headers {
+			req.Header.Add(key, val)
+		}
 	}
+
 	if headers != nil {
 		for key, val := range headers {
 			req.Header.Add(key, val)
