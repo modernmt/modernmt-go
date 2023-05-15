@@ -6,7 +6,7 @@ import (
 )
 
 func (re *memoryServices) List() ([]Memory, error) {
-	res, err := re.client.send("GET", "/memories", nil, nil)
+	res, err := re.client.send("GET", "/memories", nil, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func (re *memoryServices) Get(id int64) (Memory, error) {
 
 func (re *memoryServices) GetByKey(id string) (Memory, error) {
 	path := "/memories/" + id
-	res, err := re.client.send("GET", path, nil, nil)
+	res, err := re.client.send("GET", path, nil, nil, nil)
 	if err != nil {
 		return Memory{}, err
 	}
@@ -43,7 +43,7 @@ func (re *memoryServices) Create(name string, description string) (Memory, error
 		data["description"] = description
 	}
 
-	res, err := re.client.send("POST", "/memories", data, nil)
+	res, err := re.client.send("POST", "/memories", data, nil, nil)
 	if err != nil {
 		return Memory{}, err
 	}
@@ -64,7 +64,7 @@ func (re *memoryServices) Connect(name string, description string, externalId st
 		data["external_id"] = externalId
 	}
 
-	res, err := re.client.send("POST", "/memories", data, nil)
+	res, err := re.client.send("POST", "/memories", data, nil, nil)
 	if err != nil {
 		return Memory{}, err
 	}
@@ -89,7 +89,7 @@ func (re *memoryServices) EditByKey(id string, name string, description string) 
 	}
 
 	path := "/memories/" + id
-	res, err := re.client.send("PUT", path, data, nil)
+	res, err := re.client.send("PUT", path, data, nil, nil)
 	if err != nil {
 		return Memory{}, err
 	}
@@ -104,7 +104,7 @@ func (re *memoryServices) Delete(id int64) (Memory, error) {
 
 func (re *memoryServices) DeleteByKey(id string) (Memory, error) {
 	path := "/memories/" + id
-	res, err := re.client.send("DELETE", path, nil, nil)
+	res, err := re.client.send("DELETE", path, nil, nil, nil)
 	if err != nil {
 		return Memory{}, err
 	}
@@ -133,7 +133,7 @@ func (re *memoryServices) AddByKey(id string, source string, target string, sent
 	}
 
 	path := "/memories/" + id + "/content"
-	res, err := re.client.send("POST", path, data, nil)
+	res, err := re.client.send("POST", path, data, nil, nil)
 	if err != nil {
 		return ImportJob{}, err
 	}
@@ -159,7 +159,7 @@ func (re *memoryServices) ReplaceByKey(id string, tuid string, source string, ta
 	}
 
 	path := "/memories/" + id + "/content"
-	res, err := re.client.send("PUT", path, data, nil)
+	res, err := re.client.send("PUT", path, data, nil, nil)
 	if err != nil {
 		return ImportJob{}, err
 	}
@@ -198,7 +198,7 @@ func (re *memoryServices) ImportTmxByKey(id string, tmx *os.File, compression st
 	}
 
 	path := "/memories/" + id + "/content"
-	res, err := re.client.send("POST", path, data, files)
+	res, err := re.client.send("POST", path, data, files, nil)
 	if err != nil {
 		return ImportJob{}, err
 	}
@@ -207,7 +207,7 @@ func (re *memoryServices) ImportTmxByKey(id string, tmx *os.File, compression st
 }
 
 func (re *memoryServices) GetImportStatus(uuid string) (ImportJob, error) {
-	res, err := re.client.send("GET", "/import-jobs/"+uuid, nil, nil)
+	res, err := re.client.send("GET", "/import-jobs/"+uuid, nil, nil, nil)
 	if err != nil {
 		return ImportJob{}, err
 	}

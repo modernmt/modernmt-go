@@ -109,7 +109,7 @@ func (re *httpClient) _createRequest(path string, data map[string]interface{},
 	return re._createJsonRequest(path, data)
 }
 
-func (re *httpClient) send(method string, path string, data map[string]interface{}, files map[string]*os.File) (interface{}, error) {
+func (re *httpClient) send(method string, path string, data map[string]interface{}, files map[string]*os.File, headers map[string]string) (interface{}, error) {
 
 	req, err := re._createRequest(path, data, files)
 	if err != nil {
@@ -119,6 +119,11 @@ func (re *httpClient) send(method string, path string, data map[string]interface
 	req.Header.Add("X-HTTP-Method-Override", method)
 	for key, val := range re.headers {
 		req.Header.Add(key, val)
+	}
+	if headers != nil {
+		for key, val := range headers {
+			req.Header.Add(key, val)
+		}
 	}
 
 	res, err := re.client.Do(req)
