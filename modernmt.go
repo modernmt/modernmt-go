@@ -433,15 +433,17 @@ func (re *ModernMT) HandleTranslateListCallbackWithMetadata(body []byte, signatu
 		return nil, err
 	}
 
-	if metadata != nil {
-		// not a fan of it, but it seems the easiest way to do it
-		bytes, err := json.Marshal(jBody["metadata"])
-		if err != nil {
-			return nil, err
-		}
-		err = json.Unmarshal(bytes, metadata)
-		if err != nil {
-			return nil, err
+	if jMetadata, ok := jBody["metadata"]; ok {
+		if metadata != nil {
+			// not a fan of it, but it seems the easiest way to do it
+			bytes, err := json.Marshal(jMetadata)
+			if err != nil {
+				return nil, err
+			}
+			err = json.Unmarshal(bytes, metadata)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
