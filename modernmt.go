@@ -270,30 +270,6 @@ func (re *ModernMT) GetContextVectors(source string, targets []string, text stri
 	return re.GetContextVectorsByKeys(source, targets, text, _hints, limit)
 }
 
-func (re *ModernMT) GetContextVectorFromFile(source string, target string, file *os.File, hints []int64,
-	limit int, compression string) (string, error) {
-	_hints := toSliceOfString(hints)
-	return re.GetContextVectorFromFileByKeys(source, target, file, _hints, limit, compression)
-}
-
-func (re *ModernMT) GetContextVectorsFromFile(source string, targets []string, file *os.File, hints []int64,
-	limit int, compression string) (map[string]interface{}, error) {
-	_hints := toSliceOfString(hints)
-	return re.GetContextVectorsFromFileByKeys(source, targets, file, _hints, limit, compression)
-}
-
-func (re *ModernMT) GetContextVectorFromFilePath(source string, target string, path string, hints []int64,
-	limit int, compression string) (string, error) {
-	_hints := toSliceOfString(hints)
-	return re.GetContextVectorFromFilePathByKeys(source, target, path, _hints, limit, compression)
-}
-
-func (re *ModernMT) GetContextVectorsFromFilePath(source string, targets []string, path string, hints []int64,
-	limit int, compression string) (map[string]interface{}, error) {
-	_hints := toSliceOfString(hints)
-	return re.GetContextVectorsFromFilePathByKeys(source, targets, path, _hints, limit, compression)
-}
-
 func (re *ModernMT) GetContextVectorByKeys(source string, target string, text string, hints []string,
 	limit int) (string, error) {
 
@@ -330,6 +306,52 @@ func (re *ModernMT) GetContextVectorsByKeys(source string, targets []string, tex
 	vectors := res.(map[string]interface{})["vectors"]
 
 	return vectors.(map[string]interface{}), nil
+}
+
+func (re *ModernMT) GetContextVectorFromFile(source string, target string, file *os.File, hints []int64,
+	limit int, compression string) (string, error) {
+	_hints := toSliceOfString(hints)
+	return re.GetContextVectorFromFileByKeys(source, target, file, _hints, limit, compression)
+}
+
+func (re *ModernMT) GetContextVectorsFromFile(source string, targets []string, file *os.File, hints []int64,
+	limit int, compression string) (map[string]interface{}, error) {
+	_hints := toSliceOfString(hints)
+	return re.GetContextVectorsFromFileByKeys(source, targets, file, _hints, limit, compression)
+}
+
+func (re *ModernMT) GetContextVectorFromFilePath(source string, target string, path string, hints []int64,
+	limit int, compression string) (string, error) {
+	_hints := toSliceOfString(hints)
+	return re.GetContextVectorFromFilePathByKeys(source, target, path, _hints, limit, compression)
+}
+
+func (re *ModernMT) GetContextVectorsFromFilePath(source string, targets []string, path string, hints []int64,
+	limit int, compression string) (map[string]interface{}, error) {
+	_hints := toSliceOfString(hints)
+	return re.GetContextVectorsFromFilePathByKeys(source, targets, path, _hints, limit, compression)
+}
+
+func (re *ModernMT) GetContextVectorFromFilePathByKeys(source string, target string, path string, hints []string,
+	limit int, compression string) (string, error) {
+
+	res, err := re.GetContextVectorsFromFilePathByKeys(source, []string{target}, path, hints, limit, compression)
+	if err != nil {
+		return "", err
+	}
+
+	return res[target].(string), nil
+}
+
+func (re *ModernMT) GetContextVectorsFromFilePathByKeys(source string, targets []string, path string, hints []string,
+	limit int, compression string) (map[string]interface{}, error) {
+
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+
+	return re.GetContextVectorsFromFileByKeys(source, targets, file, hints, limit, compression)
 }
 
 func (re *ModernMT) GetContextVectorFromFileByKeys(source string, target string, file *os.File, hints []string,
@@ -375,28 +397,6 @@ func (re *ModernMT) GetContextVectorsFromFileByKeys(source string, targets []str
 	vectors := res.(map[string]interface{})["vectors"]
 
 	return vectors.(map[string]interface{}), nil
-}
-
-func (re *ModernMT) GetContextVectorFromFilePathByKeys(source string, target string, path string, hints []string,
-	limit int, compression string) (string, error) {
-
-	res, err := re.GetContextVectorsFromFilePathByKeys(source, []string{target}, path, hints, limit, compression)
-	if err != nil {
-		return "", err
-	}
-
-	return res[target].(string), nil
-}
-
-func (re *ModernMT) GetContextVectorsFromFilePathByKeys(source string, targets []string, path string, hints []string,
-	limit int, compression string) (map[string]interface{}, error) {
-
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-
-	return re.GetContextVectorsFromFileByKeys(source, targets, file, hints, limit, compression)
 }
 
 func (re *ModernMT) HandleTranslateCallback(body []byte, signature string) (Translation, error) {
