@@ -139,3 +139,50 @@ func makeDetectedLanguage(data map[string]interface{}) DetectedLanguage {
 		DetectedLanguage: data["detectedLanguage"].(string),
 	}
 }
+
+type billingPeriod struct {
+	Begin           string
+	End             string
+	Chars           int64
+	Plan            string
+	PlanDescription string
+	PlanForCatTool  bool
+	Amount          float32
+	Currency        string
+	CurrencySymbol  string
+}
+
+type User struct {
+	Id               int64
+	Name             string
+	Email            string
+	RegistrationDate string
+	Country          string
+	IsBusiness       int8
+	Status           string
+	BillingPeriod    billingPeriod
+}
+
+func makeUser(data map[string]interface{}) User {
+	bp := data["billingPeriod"].(map[string]interface{})
+	return User{
+		Id:               int64(data["id"].(float64)),
+		Name:             data["name"].(string),
+		Email:            data["email"].(string),
+		RegistrationDate: data["registrationDate"].(string),
+		Country:          data["country"].(string),
+		IsBusiness:       int8(data["isBusiness"].(float64)),
+		Status:           data["status"].(string),
+		BillingPeriod: billingPeriod{
+			Begin:           bp["begin"].(string),
+			End:             bp["end"].(string),
+			Chars:           int64(bp["chars"].(float64)),
+			Plan:            bp["plan"].(string),
+			PlanDescription: bp["planDescription"].(string),
+			PlanForCatTool:  bp["planForCatTool"].(bool),
+			Amount:          float32(bp["amount"].(float64)),
+			Currency:        bp["currency"].(string),
+			CurrencySymbol:  bp["currencySymbol"].(string),
+		},
+	}
+}

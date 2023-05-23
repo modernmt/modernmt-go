@@ -517,3 +517,12 @@ func (re *ModernMT) retrievePublicKey() (*rsa.PublicKey, error) {
 
 	return jwt.ParseRSAPublicKeyFromPEM(decoded)
 }
+
+func (re *ModernMT) Me() (User, error) {
+	res, err := re.client.send("GET", "/users/me", nil, nil, nil)
+	if err != nil {
+		return User{}, err
+	}
+
+	return makeUser(res.(map[string]interface{})), nil
+}
