@@ -186,3 +186,13 @@ func makeUser(data map[string]interface{}) User {
 		},
 	}
 }
+
+type QualityEstimation struct {
+	Score float32
+}
+
+func makeQualityEstimation(data map[string]interface{}) QualityEstimation {
+	return QualityEstimation{
+		Score: float32(data["score"].(float64)),
+	}
+}
