@@ -526,35 +526,3 @@ func (re *ModernMT) Me() (User, error) {
 
 	return makeUser(res.(map[string]interface{})), nil
 }
-
-func (re *ModernMT) Qe(source string, target string, sentence string, translation string) (QualityEstimation, error) {
-	res, err := re.QeList(source, target, []string{sentence}, []string{translation})
-	if err != nil {
-		return QualityEstimation{}, err
-	}
-
-	return res[0], nil
-}
-
-func (re *ModernMT) QeList(source string, target string,
-	sentences []string, translations []string) ([]QualityEstimation, error) {
-
-	data := map[string]interface{}{
-		"source":      source,
-		"target":      target,
-		"sentence":    sentences,
-		"translation": translations,
-	}
-
-	res, err := re.client.send("GET", "/qe", data, nil, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	var qes []QualityEstimation
-	for _, el := range res.([]interface{}) {
-		qes = append(qes, makeQualityEstimation(el.(map[string]interface{})))
-	}
-
-	return qes, nil
-}
