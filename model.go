@@ -40,6 +40,7 @@ type TranslateOptions struct {
 	Timeout         int
 	Format          string
 	AltTranslations int
+	Session         string
 
 	// batch translation
 	Metadata       interface{}

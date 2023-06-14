@@ -167,6 +167,9 @@ func (re *ModernMT) TranslateListAdaptiveWithKeys(source string, target string, 
 		if options.AltTranslations != 0 {
 			data["alt_translations"] = options.AltTranslations
 		}
+		if options.Session != "" {
+			data["session"] = options.Session
+		}
 	}
 
 	res, err := re.client.send("GET", "/translate", data, nil, nil)
@@ -241,6 +244,9 @@ func (re *ModernMT) BatchTranslateListAdaptiveWithKeys(webhook string, source st
 		}
 		if options.AltTranslations != 0 {
 			data["alt_translations"] = options.AltTranslations
+		}
+		if options.Session != "" {
+			data["session"] = options.Session
 		}
 		if options.Metadata != nil {
 			data["metadata"] = options.Metadata

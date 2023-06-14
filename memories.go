@@ -115,11 +115,22 @@ func (re *memoryServices) DeleteByKey(id string) (Memory, error) {
 func (re *memoryServices) Add(id int64, source string, target string, sentence string, translation string,
 	tuid string) (ImportJob, error) {
 	_id := strconv.FormatInt(id, 10)
-	return re.AddByKey(_id, source, target, sentence, translation, tuid)
+	return re.AddWithSessionByKey(_id, source, target, sentence, translation, tuid, "")
 }
 
 func (re *memoryServices) AddByKey(id string, source string, target string, sentence string, translation string,
 	tuid string) (ImportJob, error) {
+	return re.AddWithSessionByKey(id, source, target, sentence, translation, tuid, "")
+}
+
+func (re *memoryServices) AddWithSession(id int64, source string, target string, sentence string, translation string,
+	tuid string, session string) (ImportJob, error) {
+	_id := strconv.FormatInt(id, 10)
+	return re.AddWithSessionByKey(_id, source, target, sentence, translation, tuid, session)
+}
+
+func (re *memoryServices) AddWithSessionByKey(id string, source string, target string,
+	sentence string, translation string, tuid string, session string) (ImportJob, error) {
 
 	data := map[string]interface{}{
 		"source":      source,
@@ -130,6 +141,10 @@ func (re *memoryServices) AddByKey(id string, source string, target string, sent
 
 	if tuid != "" {
 		data["tuid"] = tuid
+	}
+
+	if session != "" {
+		data["session"] = session
 	}
 
 	path := "/memories/" + id + "/content"
@@ -144,11 +159,22 @@ func (re *memoryServices) AddByKey(id string, source string, target string, sent
 func (re *memoryServices) Replace(id int64, tuid string, source string, target string, sentence string,
 	translation string) (ImportJob, error) {
 	_id := strconv.FormatInt(id, 10)
-	return re.ReplaceByKey(_id, tuid, source, target, sentence, translation)
+	return re.ReplaceWithSessionByKey(_id, tuid, source, target, sentence, translation, "")
 }
 
 func (re *memoryServices) ReplaceByKey(id string, tuid string, source string, target string, sentence string,
 	translation string) (ImportJob, error) {
+	return re.ReplaceWithSessionByKey(id, tuid, source, target, sentence, translation, "")
+}
+
+func (re *memoryServices) ReplaceWithSession(id int64, tuid string, source string, target string, sentence string,
+	translation string, session string) (ImportJob, error) {
+	_id := strconv.FormatInt(id, 10)
+	return re.ReplaceWithSessionByKey(_id, tuid, source, target, sentence, translation, session)
+}
+
+func (re *memoryServices) ReplaceWithSessionByKey(id string, tuid string, source string, target string, sentence string,
+	translation string, session string) (ImportJob, error) {
 
 	data := map[string]interface{}{
 		"tuid":        tuid,
@@ -156,6 +182,10 @@ func (re *memoryServices) ReplaceByKey(id string, tuid string, source string, ta
 		"target":      target,
 		"sentence":    sentence,
 		"translation": translation,
+	}
+
+	if session != "" {
+		data["session"] = session
 	}
 
 	path := "/memories/" + id + "/content"
