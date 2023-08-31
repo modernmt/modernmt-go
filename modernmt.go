@@ -174,6 +174,9 @@ func (re *ModernMT) TranslateListAdaptiveWithKeys(source string, target string, 
 		if options.IgnoreGlossaryCase {
 			data["ignore_glossary_case"] = options.IgnoreGlossaryCase
 		}
+		if options.MaskProfanities {
+			data["mask_profanities"] = options.MaskProfanities
+		}
 
 		glossaries := options.Glossaries
 		if glossaries != nil {
@@ -264,6 +267,9 @@ func (re *ModernMT) BatchTranslateListAdaptiveWithKeys(webhook string, source st
 		}
 		if options.IgnoreGlossaryCase {
 			data["ignore_glossary_case"] = options.IgnoreGlossaryCase
+		}
+		if options.MaskProfanities {
+			data["mask_profanities"] = options.MaskProfanities
 		}
 		if options.Metadata != nil {
 			data["metadata"] = options.Metadata

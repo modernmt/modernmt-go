@@ -43,6 +43,7 @@ type TranslateOptions struct {
 	Session            string
 	Glossaries         interface{}
 	IgnoreGlossaryCase bool
+	MaskProfanities    bool
 
 	// batch translation
 	Metadata       interface{}
