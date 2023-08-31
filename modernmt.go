@@ -29,7 +29,7 @@ func CreateWithIdentity(apiKey string, platform string, platformVersion string) 
 }
 
 func CreateWithClientId(apiKey string, apiClient int64) *ModernMT {
-	return CreateWithIdentityAndClientId(apiKey, "modernmt-go", "1.4.0", apiClient)
+	return CreateWithIdentityAndClientId(apiKey, "modernmt-go", "1.5.0", apiClient)
 }
 
 func CreateWithIdentityAndClientId(apiKey string, platform string, platformVersion string, apiClient int64) *ModernMT {
