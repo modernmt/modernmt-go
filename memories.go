@@ -236,6 +236,107 @@ func (re *memoryServices) ImportTmxByKey(id string, tmx *os.File, compression st
 	return makeImportJob(res.(map[string]interface{})), nil
 }
 
+func (re *memoryServices) AddToGlossary(id int64, terms []GlossaryTerm, _type string, tuid string) (ImportJob, error) {
+	_id := strconv.FormatInt(id, 10)
+	return re.AddToGlossaryByKey(_id, terms, _type, tuid)
+}
+
+func (re *memoryServices) AddToGlossaryByKey(id string, terms []GlossaryTerm, _type string,
+	tuid string) (ImportJob, error) {
+
+	data := map[string]interface{}{
+		"terms": terms,
+		"type":  _type,
+	}
+
+	if tuid != "" {
+		data["tuid"] = tuid
+	}
+
+	path := "/memories/" + id + "/glossary"
+	res, err := re.client.send("POST", path, data, nil, nil)
+	if err != nil {
+		return ImportJob{}, err
+	}
+
+	return makeImportJob(res.(map[string]interface{})), nil
+}
+
+func (re *memoryServices) ReplaceInGlossary(id int64, terms []GlossaryTerm, _type string,
+	tuid string) (ImportJob, error) {
+
+	_id := strconv.FormatInt(id, 10)
+	return re.ReplaceInGlossaryByKey(_id, terms, _type, tuid)
+}
+
+func (re *memoryServices) ReplaceInGlossaryByKey(id string, terms []GlossaryTerm, _type string,
+	tuid string) (ImportJob, error) {
+
+	data := map[string]interface{}{
+		"terms": terms,
+		"type":  _type,
+	}
+
+	if tuid != "" {
+		data["tuid"] = tuid
+	}
+
+	path := "/memories/" + id + "/glossary"
+	res, err := re.client.send("PUT", path, data, nil, nil)
+	if err != nil {
+		return ImportJob{}, err
+	}
+
+	return makeImportJob(res.(map[string]interface{})), nil
+}
+
+func (re *memoryServices) ImportGlossaryPath(id int64, path string, _type string,
+	compression string) (ImportJob, error) {
+
+	_id := strconv.FormatInt(id, 10)
+	return re.ImportGlossaryPathByKey(_id, path, _type, compression)
+}
+
+func (re *memoryServices) ImportGlossaryPathByKey(id string, path string, _type string,
+	compression string) (ImportJob, error) {
+
+	file, err := os.Open(path)
+	if err != nil {
+		return ImportJob{}, err
+	}
+
+	return re.ImportGlossaryByKey(id, file, _type, compression)
+}
+
+func (re *memoryServices) ImportGlossary(id int64, csv *os.File, _type string, compression string) (ImportJob, error) {
+	_id := strconv.FormatInt(id, 10)
+	return re.ImportGlossaryByKey(_id, csv, _type, compression)
+}
+
+func (re *memoryServices) ImportGlossaryByKey(id string, csv *os.File, _type string,
+	compression string) (ImportJob, error) {
+
+	data := map[string]interface{}{
+		"type": _type,
+	}
+
+	if compression != "" {
+		data["compression"] = compression
+	}
+
+	files := map[string]*os.File{
+		"csv": csv,
+	}
+
+	path := "/memories/" + id + "/glossary"
+	res, err := re.client.send("POST", path, data, files, nil)
+	if err != nil {
+		return ImportJob{}, err
+	}
+
+	return makeImportJob(res.(map[string]interface{})), nil
+}
+
 func (re *memoryServices) GetImportStatus(uuid string) (ImportJob, error) {
 	res, err := re.client.send("GET", "/import-jobs/"+uuid, nil, nil, nil)
 	if err != nil {

@@ -34,13 +34,15 @@ func (re APIError) Error() string {
 }
 
 type TranslateOptions struct {
-	Priority        string
-	ProjectId       string
-	Multiline       *bool
-	Timeout         int
-	Format          string
-	AltTranslations int
-	Session         string
+	Priority           string
+	ProjectId          string
+	Multiline          *bool
+	Timeout            int
+	Format             string
+	AltTranslations    int
+	Session            string
+	Glossaries         interface{}
+	IgnoreGlossaryCase bool
 
 	// batch translation
 	Metadata       interface{}
@@ -196,4 +198,9 @@ func makeQualityEstimation(data map[string]interface{}) QualityEstimation {
 	return QualityEstimation{
 		Score: float32(data["score"].(float64)),
 	}
+}
+
+type GlossaryTerm struct {
+	Term     string `json:"term"`
+	Language string `json:"language"`
 }

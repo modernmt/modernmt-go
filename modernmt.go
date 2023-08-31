@@ -4,6 +4,7 @@ import (
 	"crypto/rsa"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"os"
@@ -170,6 +171,19 @@ func (re *ModernMT) TranslateListAdaptiveWithKeys(source string, target string, 
 		if options.Session != "" {
 			data["session"] = options.Session
 		}
+		if options.IgnoreGlossaryCase {
+			data["ignore_glossary_case"] = options.IgnoreGlossaryCase
+		}
+
+		glossaries := options.Glossaries
+		if glossaries != nil {
+			switch glossaries.(type) {
+			case []int64, []string:
+				data["glossaries"] = glossaries
+			default:
+				return nil, errors.New("glossaries must be a slice of int64 or string")
+			}
+		}
 	}
 
 	res, err := re.client.send("GET", "/translate", data, nil, nil)
@@ -248,11 +262,24 @@ func (re *ModernMT) BatchTranslateListAdaptiveWithKeys(webhook string, source st
 		if options.Session != "" {
 			data["session"] = options.Session
 		}
+		if options.IgnoreGlossaryCase {
+			data["ignore_glossary_case"] = options.IgnoreGlossaryCase
+		}
 		if options.Metadata != nil {
 			data["metadata"] = options.Metadata
 		}
 		if options.IdempotencyKey != "" {
 			headers["x-idempotency-key"] = options.IdempotencyKey
+		}
+
+		glossaries := options.Glossaries
+		if glossaries != nil {
+			switch glossaries.(type) {
+			case []int64, []string:
+				data["glossaries"] = glossaries
+			default:
+				return false, errors.New("glossaries must be a slice of int64 or string")
+			}
 		}
 	}
 
