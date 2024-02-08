@@ -51,12 +51,13 @@ type TranslateOptions struct {
 }
 
 type Translation struct {
-	Translation      string
-	ContextVector    string
-	Characters       int
-	BilledCharacters int
-	DetectedLanguage string
-	AltTranslations  []string
+	Translation         string
+	ContextVector       string
+	Characters          int
+	BilledCharacters    int
+	DetectedLanguage    string
+	AltTranslations     []string
+	DetectedProfanities bool
 }
 
 func makeTranslation(data map[string]interface{}) Translation {
@@ -83,6 +84,11 @@ func makeTranslation(data map[string]interface{}) Translation {
 			altTranslations[i] = v.(string)
 		}
 		translation.AltTranslations = altTranslations
+	}
+
+	detectedProfanities, ok := data["detectedProfanities"].(bool)
+	if ok {
+		translation.DetectedProfanities = detectedProfanities
 	}
 
 	return translation
