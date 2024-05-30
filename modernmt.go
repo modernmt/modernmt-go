@@ -585,7 +585,7 @@ func (re *ModernMT) QeList(source string, target string,
 		"translation": translations,
 	}
 
-	res, err := re.client.send("GET", "/qe", data, nil, nil)
+	res, err := re.client.send("GET", "/translate/qe", data, nil, nil)
 	if err != nil {
 		return nil, err
 	}
